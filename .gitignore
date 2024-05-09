@@ -1,1 +1,2 @@
-/topic-practice/target
+/topic-practice/target/*
+/topic-practice/.DS_Store
