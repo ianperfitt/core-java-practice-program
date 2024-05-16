@@ -1,5 +1,5 @@
 target/
-bin/
+*.class
 **/.DS_Store
 **/.DS_Store
 /.metadata/
