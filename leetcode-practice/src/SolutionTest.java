@@ -8,21 +8,33 @@ class SolutionTest {
 	private String s;
 
 	@Test
-	void shouldEqualThree() {
-		s = "abcabcbb";
-		assertEquals(3, Solution.lengthOfLongestSubstring(s));
+	void test1() {
+		s = "/home/";
+		assertEquals("/home", Solution.simplifyPath(s));
 	}
 
 	@Test
-	void shouldEqualOne() {
-		s = "bbbbb";
-		assertEquals(1, Solution.lengthOfLongestSubstring(s));
+	void test2() {
+		s = "/home//foo/";
+		assertEquals("/home/foo", Solution.simplifyPath(s));
 	}
 
 	@Test
-	void shouldEqual3Also() {
-		s = "pwwkew";
-		assertEquals(3, Solution.lengthOfLongestSubstring(s));
+	void test3() {
+		s = "/home/user/Documents/../Pictures";
+		assertEquals("/home/user/Pictures", Solution.simplifyPath(s));
+	}
+
+	@Test
+	void test4() {
+		s = "/../";
+		assertEquals("/", Solution.simplifyPath(s));
+	}
+
+	@Test
+	void test5() {
+		s = "/.../a/../b/c/../d/./";
+		assertEquals("/.../b/d", Solution.simplifyPath(s));
 	}
 
 }
