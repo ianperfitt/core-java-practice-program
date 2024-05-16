@@ -2,32 +2,24 @@ import java.util.Stack;
 
 class Solution {
 
-	public static String simplifyPath(String path) {
+	public static String makeGood(String s) {
 
-		Stack<String> stack = new Stack<String>();
+		Stack<Character> stack = new Stack<>();
 
-		for (String s : path.split("/")) {
+		for (char c : s.toCharArray()) {
 
-			if (s.equals(".") || s.isEmpty()) {
-				continue;
-			}
-
-			else if (s.equals("..")) {
-
-				if (!stack.isEmpty()) {
-					stack.pop();
+			if (!stack.isEmpty()) {
+				if (stack.pop() == c) {
+					stack.push(c);
+					continue;
 				}
-			} else {
-				stack.add(s);
+				if (Character.toUpperCase(stack.peek()) == c || Character.toLowerCase(stack.peek()) == c) {
+					stack.pop();
+					continue;
+				}
 			}
+			stack.push(c);
 		}
-
-		StringBuilder result = new StringBuilder();
-		for (String dir : stack) {
-			result.append("/");
-			result.append(dir);
-		}
-
-		return result.length() > 0 ? result.toString() : "/";
+		return stack.toString();
 	}
 }
