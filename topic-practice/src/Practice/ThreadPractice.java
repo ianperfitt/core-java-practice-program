@@ -19,6 +19,8 @@ public class ThreadPractice {
 				}
 				data = value;
 				available = true;
+				// Used for inter thread communication and
+				// synchronize the activities of multiple threads.
 				notify();
 			}
 		}
@@ -41,7 +43,7 @@ public class ThreadPractice {
 
 		SharedResource sharedResource = threadPractice.new SharedResource();
 
-		// Runnable passes method containing IntStream to 
+		// Runnable passes method containing IntStream to
 		// run() method
 		Runnable producerRunnable = () -> {
 
