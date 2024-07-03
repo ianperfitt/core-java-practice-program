@@ -4,8 +4,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.IntStream;
 
-import org.w3c.dom.css.Counter;
-
 public class ThreadPractice {
 
 	// Inner class
@@ -110,5 +108,47 @@ public class ThreadPractice {
 			});
 		});
 		executorService.shutdown();
+
+		// Creating ThreadGroups
+		ThreadGroup group1 = new ThreadGroup("Group 1");
+		ThreadGroup parentGroup = new ThreadGroup("Parent Group");
+		ThreadGroup group2 = new ThreadGroup(parentGroup, "Group 2");
+
+		// Adding Threads to a ThreadGroup
+		ThreadGroup group = new ThreadGroup("Group");
+
+		// Set priority for thread group.
+		group.setMaxPriority(Thread.NORM_PRIORITY);
+
+		Thread thread1 = new Thread(group, () -> {
+			IntStream.range(1, 6).forEach((e) -> {
+				System.out.println(Thread.currentThread().getName() + " in " + group.getName());
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			});
+		}, "Thread 1");
+
+		Thread thread2 = new Thread(group, () -> {
+			for (int i = 0; i < 5; i++) {
+				System.out.println(Thread.currentThread().getName() + " in " + group.getName());
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}, "Thread 2");
+
+		thread1.start();
+		thread2.start();
+		// Retreive number of active threads in "Group" thread group
+		int activeThreads = group.activeCount();
+		System.out.println("Active Threads: " + activeThreads);
+		thread1.join();
+		thread2.join();
 	}
 }
