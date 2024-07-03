@@ -1,7 +1,10 @@
 package Practice;
 
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
 public class ThreadPractice {
@@ -44,6 +47,25 @@ public class ThreadPractice {
 				notify();
 				return data;
 			}
+		}
+	}
+
+	class Task implements Runnable {
+		private final String name;
+
+		public Task(String name) {
+			this.name = name;
+		}
+
+		@Override
+		public void run() {
+			System.out.println("Task " + name + " is being executed by " + Thread.currentThread().getName());
+			try {
+				Thread.sleep(2000); // Simulate long-running task
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+
 		}
 	}
 
@@ -99,23 +121,6 @@ public class ThreadPractice {
 		System.out.println("Producer is alive: " + producer.isAlive());
 		System.out.println("Consumer is alive: " + consumer.isAlive());
 		System.out.println("Final data count: " + sharedResource.data);
-
-		// Thread pooling using ExecutorService example
-		ExecutorService executorService = Executors.newFixedThreadPool(3);
-
-		IntStream.range(1, 6).forEach((i) -> {
-			final int taskId = i;
-			executorService.submit(() -> {
-				System.out.println("Task " + taskId + " executed by " + Thread.currentThread().getName());
-				try {
-					Thread.sleep(2000);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			});
-		});
-		executorService.shutdown();
 
 		// Creating ThreadGroups
 		ThreadGroup parentGroup = new ThreadGroup("Parent Group");
@@ -210,5 +215,53 @@ public class ThreadPractice {
 			System.out.println("Child Thread Value: " + threadLocal3.get());
 		});
 		childThread.start();
+
+		// Create a fixed thread pool with 2 threads
+		ExecutorService executorService = Executors.newFixedThreadPool(2);
+
+		// Submit tasks to the executor service
+		executorService.submit(() -> System.out.println("Task 1 executed by " + Thread.currentThread().getName()));
+		executorService.submit(() -> System.out.println("Task 2 executed by " + Thread.currentThread().getName()));
+		executorService.submit(() -> System.out.println("Task 3 executed by " + Thread.currentThread().getName()));
+
+		// Submitting a Runnable task to ExecutorService.
+		Future<?> future1 = executorService.submit(() -> {
+			System.out.println("Runnable task executed by " + Thread.currentThread().getName());
+		});
+
+		// Submitting a Callable task to the ExecutorService.
+		Future<String> future2 = executorService.submit(() -> {
+			System.out.println("Callable task executed by " + Thread.currentThread().getName());
+			return "Result from Callable task";
+		});
+
+		String result;
+		try {
+			result = future2.get();
+			System.out.println(result);
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+		}
+
+		executorService.shutdown();
+
+		ExecutorService executorService2 = Executors.newFixedThreadPool(3);
+
+		IntStream.range(1, 6).forEach((i) -> {
+			Task task = threadPractice.new Task("Task " + i);
+		});
+
+		executorService2.shutdown();
+
+		// Gracefully shutdown threadExecutor
+		try {
+			if (!executorService2.awaitTermination(60, TimeUnit.SECONDS)) {
+				executorService2.shutdownNow();
+			}
+		} catch (InterruptedException e) {
+			executorService2.shutdownNow();
+		}
+		System.out.println("All  tasks are finished !");
+
 	}
 }
