@@ -1,6 +1,10 @@
 package Practice;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.IntStream;
+
+import org.w3c.dom.css.Counter;
 
 public class ThreadPractice {
 
@@ -88,7 +92,23 @@ public class ThreadPractice {
 		// and consumer are in terminated state
 		System.out.println("Producer is alive: " + producer.isAlive());
 		System.out.println("Consumer is alive: " + consumer.isAlive());
-
 		System.out.println("Final data count: " + sharedResource.data);
+
+		// Thread pooling using ExecutorService example
+		ExecutorService executorService = Executors.newFixedThreadPool(3);
+
+		IntStream.range(1, 6).forEach((i) -> {
+			final int taskId = i;
+			executorService.submit(() -> {
+				System.out.println("Task " + taskId + " executed by " + Thread.currentThread().getName());
+				try {
+					Thread.sleep(2000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			});
+		});
+		executorService.shutdown();
 	}
 }
