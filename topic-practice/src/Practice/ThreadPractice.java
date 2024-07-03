@@ -6,8 +6,13 @@ import java.util.stream.IntStream;
 
 public class ThreadPractice {
 
-	// Create a thread-local variable
+	// Create a thread-local variable.
 	private static ThreadLocal<Integer> threadLocal = new ThreadLocal<>();
+	// Specify an initial value for thread-local variable.
+	private static ThreadLocal<Integer> threadLocal2 = ThreadLocal.withInitial(() -> 1);
+	// InheritableThreadLocal extends ThreadLocal and allows threads to inherit
+	// values from their parent thread.
+	private static InheritableThreadLocal<Integer> threadLocal3 = new InheritableThreadLocal<>();
 
 	// Inner class
 	class SharedResource {
@@ -183,5 +188,27 @@ public class ThreadPractice {
 
 		thread3.start();
 		thread4.start();
+
+		System.out.println("Main Thread Initial Value: " + threadLocal2.get());
+
+		Thread thread5 = new Thread(() -> {
+			threadLocal.set(threadLocal2.get() + 1);
+			System.out.println("Thread 1 Incremented Value: " + threadLocal.get());
+		});
+
+		Thread thread6 = new Thread(() -> {
+			threadLocal.set(threadLocal2.get() + 2);
+			System.out.println("Thread 2 Incremented Value: " + threadLocal.get());
+		});
+
+		thread5.start();
+		thread6.start();
+
+		threadLocal3.set(42);
+		System.out.println("Main Thread value: " + threadLocal3.get());
+		Thread childThread = new Thread(() -> {
+			System.out.println("Child Thread Value: " + threadLocal3.get());
+		});
+		childThread.start();
 	}
 }
