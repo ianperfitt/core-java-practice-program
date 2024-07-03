@@ -110,9 +110,13 @@ public class ThreadPractice {
 		executorService.shutdown();
 
 		// Creating ThreadGroups
-		ThreadGroup group1 = new ThreadGroup("Group 1");
 		ThreadGroup parentGroup = new ThreadGroup("Parent Group");
+		ThreadGroup group1 = new ThreadGroup(parentGroup, "Group 1");
 		ThreadGroup group2 = new ThreadGroup(parentGroup, "Group 2");
+
+		// Obtain the estimated number of active groups in a thread group.
+		int activeGroups = parentGroup.activeGroupCount();
+		System.out.println("Active Groups: " + activeGroups);
 
 		// Adding Threads to a ThreadGroup
 		ThreadGroup group = new ThreadGroup("Group");
@@ -145,9 +149,16 @@ public class ThreadPractice {
 
 		thread1.start();
 		thread2.start();
-		// Retreive number of active threads in "Group" thread group
+		// Retrieve number of active threads in "Group" thread group
 		int activeThreads = group.activeCount();
 		System.out.println("Active Threads: " + activeThreads);
+
+		// Copy into the specified array every active thread in the group
+		Thread[] threads = new Thread[group.activeCount()];
+		group.enumerate(threads);
+		for (Thread t : threads) {
+			System.out.println("Thread name: " + t.getName());
+		}
 		thread1.join();
 		thread2.join();
 	}
