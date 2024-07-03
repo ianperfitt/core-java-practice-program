@@ -6,6 +6,9 @@ import java.util.stream.IntStream;
 
 public class ThreadPractice {
 
+	// Create a thread-local variable
+	private static ThreadLocal<Integer> threadLocal = new ThreadLocal<>();
+
 	// Inner class
 	class SharedResource {
 		private int data = 0;
@@ -161,5 +164,24 @@ public class ThreadPractice {
 		}
 		thread1.join();
 		thread2.join();
+
+		// Set ThreadLocal variable for main thread
+		threadLocal.set(100);
+		System.out.println("Main Thread Value: " + threadLocal.get());
+
+		Thread thread3 = new Thread(() -> {
+			// Set ThreadLocal variable for thread 3
+			threadLocal.set(200);
+			System.out.println("Thread 3 Value: " + threadLocal.get());
+		});
+
+		Thread thread4 = new Thread(() -> {
+			// Set ThreadLocal variable for thread 4
+			threadLocal.set(300);
+			System.out.println("Thread 4 Value: " + threadLocal.get());
+		});
+
+		thread3.start();
+		thread4.start();
 	}
 }
