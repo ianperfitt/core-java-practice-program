@@ -1,10 +1,13 @@
 package Practice;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.IntStream;
 
 public class ThreadPractice {
@@ -66,6 +69,31 @@ public class ThreadPractice {
 				e.printStackTrace();
 			}
 
+		}
+	}
+
+	class CallableTask implements Callable<String> {
+		private final String name;
+
+		public CallableTask(String name) {
+			this.name = name;
+		}
+
+		@Override
+		public String call() throws Exception {
+			System.out.println("Task " + name + " is being executed by " + Thread.currentThread().getName());
+			Thread.sleep(2000); // Simulate long-running task
+			return "Result of " + name;
+		}
+	}
+
+	class MyCallable implements Callable<Integer> {
+
+		@Override
+		public Integer call() throws Exception {
+			// Simulate long-running task
+			Thread.sleep(5000);
+			return 123;
 		}
 	}
 
@@ -264,5 +292,59 @@ public class ThreadPractice {
 		}
 		System.out.println("All  tasks are finished !");
 
+		// Another CallableFuture demo
+		ExecutorService executorService3 = Executors.newFixedThreadPool(3);
+
+		Future<String> future3 = executorService3.submit(threadPractice.new CallableTask("Task 3"));
+		Future<String> future4 = executorService3.submit(threadPractice.new CallableTask("Task 4"));
+
+		try {
+			System.out.println(future3.get());
+			System.out.println(future4.get());
+
+		} catch (InterruptedException | ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			executorService.shutdown();
+		}
+
+		ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(2);
+
+		// Schedule a task to run every 3 seconds, with an initial delay of 2 seconds
+		scheduledExecutorService.scheduleAtFixedRate(() -> {
+			System.out.println("Fixed rate task executed at " + System.currentTimeMillis());
+		}, 2, 3, TimeUnit.SECONDS);
+
+		// Let the main thread sleep for 10 seconds to observe the scheduled task
+		// execution
+		Thread.sleep(10000);
+
+		scheduledExecutorService.shutdown();
+
+		ExecutorService executor = Executors.newSingleThreadExecutor();
+		Future<Integer> future = executor.submit(threadPractice.new MyCallable());
+
+		System.out.println("Task submitted.");
+
+		Integer result2 = null;
+		try {
+			result2 = future.get(2, TimeUnit.SECONDS);
+			System.out.println("Task completed with result: " + result2);
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+		} catch (TimeoutException e) {
+			System.out.println("Task timed out. Cancelling...");
+			future.cancel(true);
+			e.printStackTrace();
+		} finally {
+			executor.shutdown();
+		}
+
+		if (future.isCancelled()) {
+			System.out.println("Task was cancelled.");
+		} else if (future.isDone()) {
+			System.out.println("Task completed.");
+		}
 	}
 }
