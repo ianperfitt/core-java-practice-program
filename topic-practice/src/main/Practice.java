@@ -1,4 +1,4 @@
-package Practice;
+package main;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.IntStream;
 
-public class ThreadPractice {
+public class Practice {
 
 	// Create a thread-local variable.
 	private static ThreadLocal<Integer> threadLocal = new ThreadLocal<>();
@@ -97,9 +97,9 @@ public class ThreadPractice {
 		}
 	}
 
-	public static void main(String[] args) throws InterruptedException {
+	private static void multiThreading() throws InterruptedException {
 
-		ThreadPractice threadPractice = new ThreadPractice();
+		Practice threadPractice = new Practice();
 
 		SharedResource sharedResource = threadPractice.new SharedResource();
 
@@ -346,5 +346,22 @@ public class ThreadPractice {
 		} else if (future.isDone()) {
 			System.out.println("Task completed.");
 		}
+
+		// Creating a cached thread pool
+		ExecutorService executorServiceCached = Executors.newCachedThreadPool();
+
+		for (int i = 1; i <= 5; i++) {
+			final int taskId = i;
+			executorServiceCached.submit(() -> {
+				System.out.println("Task " + taskId + " executed by " + Thread.currentThread().getName());
+			});
+		}
+		executorServiceCached.shutdown();
+
+	}
+
+	public static void main(String[] args) throws InterruptedException {
+
+		multiThreading();
 	}
 }
