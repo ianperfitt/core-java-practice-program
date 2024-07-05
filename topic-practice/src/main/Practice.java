@@ -8,6 +8,11 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.IntStream;
 
 public class Practice {
@@ -94,6 +99,57 @@ public class Practice {
 			// Simulate long-running task
 			Thread.sleep(5000);
 			return 123;
+		}
+	}
+
+	public class ReentrantLockExample {
+		private final Lock lock = new ReentrantLock();
+		private int counter = 0;
+
+		public void increment() {
+			// increment method is protected by the lock which ensures thread-safe access to
+			// counter variable
+			lock.lock();
+			try {
+				counter++;
+				System.out.println(Thread.currentThread().getName() + " - Counter: " + counter);
+			} finally {
+				lock.unlock();
+			}
+		}
+	}
+
+	public class ReadWriteLockExample {
+		private final ReadWriteLock lock = new ReentrantReadWriteLock();
+		private int counter = 0;
+
+		public void increment() {
+			lock.writeLock().lock();
+			try {
+				counter++;
+				System.out.println(Thread.currentThread().getName() + " - Counter: " + counter);
+			} finally {
+				lock.writeLock().unlock();
+			}
+		}
+
+		public int getCounter() {
+			lock.readLock().lock();
+			try {
+				return counter;
+			} finally {
+				lock.readLock().unlock();
+			}
+		}
+	}
+
+	public class AtomicIntegerExample {
+
+		private final AtomicInteger counter = new AtomicInteger(0);
+
+		public void increment() {
+			int newValue = counter.incrementAndGet();
+			System.out.println(Thread.currentThread().getName() + " - Counter: " + newValue);
 		}
 	}
 
@@ -303,7 +359,6 @@ public class Practice {
 			System.out.println(future4.get());
 
 		} catch (InterruptedException | ExecutionException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
 			executorService.shutdown();
@@ -357,6 +412,54 @@ public class Practice {
 			});
 		}
 		executorServiceCached.shutdown();
+
+		// ReentrantLock example
+		ReentrantLockExample example = threadPractice.new ReentrantLockExample();
+		Runnable task = () -> {
+			for (int i = 0; i < 5; i++) {
+				example.increment();
+			}
+		};
+
+		Thread t1 = new Thread(task);
+		Thread t2 = new Thread(task);
+
+		t1.start();
+		t2.start();
+
+		// ReadWriteLock Example
+		ReadWriteLockExample example2 = threadPractice.new ReadWriteLockExample();
+
+		Runnable writeTask = () -> {
+			for (int i = 0; i < 5; i++) {
+				example.increment();
+			}
+		};
+
+		Runnable readTask = () -> {
+			for (int i = 0; i < 5; i++) {
+				System.out.println(Thread.currentThread().getName() + " - Counter: " + example2.getCounter());
+			}
+		};
+
+		Thread t5 = new Thread(writeTask);
+		Thread t6 = new Thread(readTask);
+
+		t5.start();
+		t6.start();
+
+		AtomicIntegerExample example3 = threadPractice.new AtomicIntegerExample();
+		Runnable task2 = () -> {
+			for (int i = 0; i < 5; i++) {
+				example3.increment();
+			}
+		};
+
+		Thread t7 = new Thread(task2);
+		Thread t8 = new Thread(task2);
+
+		t7.start();
+		t8.start();
 
 	}
 
