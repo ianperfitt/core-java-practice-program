@@ -462,9 +462,10 @@ public class Practice {
 		t8.start();
 
 	}
-
-	public static void main(String[] args) throws InterruptedException {
-
-		multiThreading();
-	}
+	
+ 
+//	public static void main(String[] args) throws InterruptedException {
+//
+//		multiThreading();
+//	}
 }

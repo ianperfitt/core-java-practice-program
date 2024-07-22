@@ -1,29 +1,31 @@
+import java.util.Scanner;
+
 class Solution {
 
-	public static int getCommon(int[] nums1, int[] nums2) {
+	public static void main(String[] args) {
 
-		// nums1 pointer
-		int i = 0;
-		// nums2 pointer
-		int j = 0;
-		int MIN_VAL = Integer.MAX_VALUE;
+		Scanner scanner = new Scanner(System.in);
+		System.out.println("Enter  your string:");
+		String s = scanner.nextLine();
+		System.out.println(countVowelsAndConsonants(s)[0]);
+		System.out.println(countVowelsAndConsonants(s)[1]);
+		
+	}
 
-		while (i < nums1.length && j < nums2.length) {
-			if (nums1[i] != nums2[j] && nums1[i] < nums2[j]) {
-				++i;
-				continue;
-			} else if (nums1[i] != nums2[j] && nums1[i] > nums2[j]) {
-				++j;
-				continue;
+	private static int[] countVowelsAndConsonants(String s) {
+
+		int vowels = 0;
+		int consonants = 0;
+
+		for (char c : s.toCharArray()) {
+			if (c >= 'a' && c <= 'z') {
+				if ("aeiou".indexOf(c) != -1) {
+					vowels++;
+				} else {
+					consonants++;
+				}
 			}
-			// nums1[i] & nums2[j] are equal
-			// so check if val is new min common int
-			else if (nums1[i] < MIN_VAL) {
-				MIN_VAL = nums1[i];
-			}
-			++i;
-			++j;
 		}
-		return MIN_VAL == Integer.MAX_VALUE ? -1 : MIN_VAL;
+		return new int[] { vowels, consonants };
 	}
 }
